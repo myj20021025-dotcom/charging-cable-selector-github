@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>充电站电缆截面选型</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 16px 10px 24px;
+      background: #d4d4d4;
+      font: 13px/1.35 "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .window {
+      width: 100%;
+      max-width: 368px;
+      background: #fff;
+      border: 1px solid #6d6d6d;
+      border-radius: 4px;
+      box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .titlebar {
+      padding: 8px 10px;
+      background: linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%);
+      border-bottom: 1px solid #b0b0b0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: default;
+      user-select: none;
+    }
+    .display {
+      margin: 10px;
+      padding: 8px 10px;
+      background: #f0f0f0;
+      border: 1px solid #a0a0a0;
+      border-radius: 2px;
+      min-height: 56px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+    .display dl { margin: 0; }
+    .display dt { color: #444; font-size: 11px; margin-top: 6px; }
+    .display dt:first-child { margin-top: 0; }
+    .display dd { margin: 2px 0 0; font-size: 15px; font-weight: 700; }
+    .display .warn { font-size: 11px; font-weight: 400; color: #c00000; }
+    .panel { padding: 0 10px 10px; }
+    .field {
+      display: grid;
+      grid-template-columns: 108px 1fr;
+      gap: 6px 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .field label {
+      font-size: 11px;
+      color: #333;
+      line-height: 1.2;
+    }
+    input, select {
+      width: 100%;
+      padding: 3px 5px;
+      font: 12px inherit;
+      border: 1px solid #7a7a7a;
+      border-radius: 2px;
+      background: #fff;
+      color: #000;
+      height: 24px;
+    }
+    select { padding: 2px 2px; }
+    input:focus, select:focus {
+      outline: 1px solid #0078d7;
+      outline-offset: 0;
+    }
+    /* 微信/iPhone：输入框字号≥16px 可减焦点放大；略加大点击区域 */
+    @media (max-width: 480px) {
+      body { padding: 10px 8px 20px; }
+      input, select {
+        font-size: 16px;
+        min-height: 40px;
+        height: auto;
+      }
+      .field { grid-template-columns: 96px 1fr; }
+    }
+    details {
+      margin: 8px 10px 10px;
+      border: 1px solid #c0c0c0;
+      border-radius: 2px;
+      background: #fafafa;
+      font-size: 11px;
+    }
+    details summary {
+      padding: 5px 8px;
+      cursor: pointer;
+      background: #eee;
+      border-bottom: 1px solid #c0c0c0;
+      user-select: none;
+    }
+    details[open] summary { border-bottom: 1px solid #c0c0c0; }
+    .steps-pre {
+      margin: 0;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font: 11px/1.45 Consolas, "Courier New", monospace;
+      color: #222;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .foot {
+      margin: 0 10px 10px;
+      font-size: 10px;
+      color: #555;
+      line-height: 1.4;
+    }
+    details.deploy {
+      margin: 0 10px 12px;
+      border: 1px dashed #999;
+      border-radius: 2px;
+      background: #fffef5;
+      font-size: 11px;
+    }
+    details.deploy summary {
+      padding: 6px 8px;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+    }
+    .deploy-body {
+      padding: 0 10px 10px;
+      color: #333;
+      line-height: 1.45;
+    }
+    .deploy-body p { margin: 0.5em 0; }
+    .deploy-body ol { margin: 0.4em 0 0.4em 1.2em; padding: 0; }
+    .deploy-body li { margin-bottom: 0.35em; }
+    .deploy-body code { font-size: 10px; background: #eee; padding: 0 3px; }
+    .deploy-tip { font-size: 10px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar">充电站电缆截面 · GB 50217-2018 附录 C / D</div>
+    <div id="summary" class="display" aria-live="polite"></div>
+    <div class="panel">
+      <div class="field">
+        <label for="p">功率 P (kW)</label>
+        <input id="p" type="number" min="1" step="0.1" value="120" />
+      </div>
+      <div class="field">
+        <label for="u">电压</label>
+        <select id="u">
+          <option value="380" selected>三相 380 V</option>
+          <option value="240">单相 240 V</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pf">cos φ</label>
+        <input id="pf" type="number" min="0.1" max="1" step="0.01" value="0.98" />
+      </div>
+      <div class="field">
+        <label for="len">长度 L (m)</label>
+        <input id="len" type="number" min="1" step="1" value="80" />
+      </div>
+      <div class="field">
+        <label for="du">ΔU 限值 (%)</label>
+        <input id="du" type="number" min="0.1" max="20" step="0.1" value="5" />
+      </div>
+      <div class="field">
+        <label for="lay">敷设</label>
+        <select id="lay">
+          <option value="air" selected>空气 · 表 C.0.1-3</option>
+          <option value="buried">直埋 · 表 C.0.1-4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="tamb">环境 (℃)</label>
+        <input id="tamb" type="number" step="1" value="40" />
+      </div>
+      <div class="field" id="soilRow">
+        <label for="soil">土壤 ρ</label>
+        <select id="soil">
+          <option value="2.0" selected>2.0</option>
+          <option value="0.8">0.8</option>
+          <option value="1.2">1.2</option>
+          <option value="1.5">1.5</option>
+          <option value="3.0">3.0</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="parallel">并联根数</label>
+        <select id="parallel">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="spacing">间距 S/d</label>
+        <select id="spacing">
+          <option value="1d">1</option>
+          <option value="2d" selected>2</option>
+          <option value="3d">3</option>
+        </select>
+      </div>
+    </div>
+    <details>
+      <summary>计算过程</summary>
+      <pre id="steps" class="steps-pre"></pre>
+    </details>
+    <p class="foot">辅助计算，工程以产品资料与规范正文为准。ρ 单位 K·m/W；并联校正见 D.0.5（仅空气）。</p>
+    <details class="deploy">
+      <summary>微信里怎么打开？需要网页链接</summary>
+      <div class="deploy-body">
+        <p><strong>说明：</strong>微信里点链接打开的是<strong>https://…</strong> 网页。单个 .html 文件发到聊天里是文件，不是链接；要让客户在<strong>微信内置浏览器</strong>里直接用，必须把本页放到<strong>公网 HTTPS</strong>（或企业已备案域名）上。</p>
+        <p><strong>做法（任选其一）：</strong></p>
+        <ol>
+          <li><strong>Gitee Pages（国内常用）：</strong>新建公开仓库 → 本文件上传并改名为 <code>index.html</code> 放在仓库根目录 → 服务 → Gitee Pages 开启 → 用提供的 <code>https://…gitee.io/…</code> 地址发微信。</li>
+          <li><strong>GitHub Pages：</strong>同理推仓库，Settings → Pages 选分支，得到 <code>https://用户名.github.io/仓库名/</code>。</li>
+          <li><strong>Netlify Drop：</strong>打开 app.netlify.com/drop ，把本 html 拖进去（可改名为 index.html），秒得 <code>https://xxx.netlify.app</code> 链接。</li>
+          <li><strong>公司服务器 / 对象存储：</strong>Nginx 静态目录、阿里云/腾讯云 OSS 静态网站托管等，配置 HTTPS 后把链接发给客户即可。</li>
+        </ol>
+        <p class="deploy-tip">备案与合规以贵司网安要求为准；仅内网使用可放内网 HTTPS，链接仅内网微信/浏览器可访问。</p>
+      </div>
+    </details>
+  </div>
+  <script>
+(function () {
+  "use strict";
+
+  // 附录 C 表 C.0.1-3：1kV～3kV XLPE，空气中，3 芯（铝 / 铜），A
+  const SEC = [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
+  const I_AIR_AL = [91, 114, 146, 178, 214, 246, 278, 319, 378, 419, 611, 712, 826];
+  const I_AIR_CU = [118, 150, 182, 228, 273, 314, 360, 410, 483, 552, 771, 885, 1008];
+
+  // 附录 C 表 C.0.1-4：直埋 3 芯 品字形 单侧（铝 / 铜），ρ=2.0，25℃ 环境
+  const I_BUR_AL = [91, 113, 134, 165, 195, 221, 247, 278, 321, 365, 456, 517, 582];
+  const I_BUR_CU = [117, 143, 169, 208, 247, 282, 321, 356, 408, 469, 574, 635, 704];
+
+  // 附录 D 表 D.0.1：θm=90℃，空气中
+  const TEMP_K_AIR = { 30: 1.09, 35: 1.05, 40: 1.0, 45: 0.94 };
+  // θm=90℃，土壤
+  const TEMP_K_SOIL = { 20: 1.04, 25: 1.0, 30: 0.96, 35: 0.92 };
+
+  // 附录 D 表 D.0.3（相对 ρ=1.2 的系数）；表 C.0.1-4 基准为 ρ=2.0 → 相对 1.2 的系数取 0.87
+  const SOIL_K = { 0.8: 1.05, 1.2: 1.0, 1.5: 0.93, 2.0: 0.87, 3.0: 0.75 };
+  const SOIL_REF_BURIED_TABLE = 2.0;
+
+  // 附录 D 表 D.0.5
+  const PARALLEL_K = {
+    "1d": { 2: 1.0, 3: 0.9, 4: 0.85, 5: 0.82, 6: 0.81 },
+    "2d": { 2: 1.0, 3: 1.0, 4: 0.98, 5: 0.95, 6: 0.93 },
+    "3d": { 2: 1.0, 3: 1.0, 4: 1.0, 5: 0.98, 6: 0.97 },
+  };
+
+  /** 90℃ 近似交流电阻 mΩ/m（铜，三芯 XLPE 工程常用量级，用于电压降） */
+  const R_CU_MOHM_M = {
+    25: 9.45, 35: 6.75, 50: 4.95, 70: 3.45, 95: 2.52, 120: 2.01,
+    150: 1.62, 185: 1.29, 240: 1.0, 300: 0.82, 400: 0.63, 500: 0.51, 630: 0.41,
+  };
+  /** 电抗约值 mΩ/m（三芯 1kV，相间距中等） */
+  const X_MOHM_M = {
+    25: 0.1, 35: 0.095, 50: 0.09, 70: 0.085, 95: 0.08, 120: 0.08,
+    150: 0.075, 185: 0.075, 240: 0.07, 300: 0.069, 400: 0.067, 500: 0.065, 630: 0.063,
+  };
+
+  function interpTempK(table, t) {
+    const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
+    if (table[t] != null) return table[t];
+    if (t <= keys[0]) return table[keys[0]];
+    if (t >= keys[keys.length - 1]) return table[keys[keys.length - 1]];
+    let i = 0;
+    while (i < keys.length - 1 && keys[i + 1] < t) i++;
+    const t0 = keys[i], t1 = keys[i + 1];
+    const k0 = table[t0], k1 = table[t1];
+    return k0 + ((k1 - k0) * (t - t0)) / (t1 - t0);
+  }
+
+  function soilFactor(userRho) {
+    const ku = SOIL_K[userRho];
+    const k0 = SOIL_K[SOIL_REF_BURIED_TABLE];
+    if (ku == null || k0 == null) return 1;
+    return ku / k0;
+  }
+
+  function parallelFactor(n, spacingKey) {
+    if (n === 1) return 1;
+    const row = PARALLEL_K[spacingKey] || PARALLEL_K["2d"];
+    return row[n] != null ? row[n] : row[6];
+  }
+
+  function getBaseArrays(lay) {
+    if (lay === "buried") return { al: I_BUR_AL, cu: I_BUR_CU, name: "表 C.0.1-4（直埋，3 芯）" };
+    return { al: I_AIR_AL, cu: I_AIR_CU, name: "表 C.0.1-3（空气中，3 芯）" };
+  }
+
+  function minSectionForAmp(Ireq, Iarr, kProd) {
+    for (let i = 0; i < SEC.length; i++) {
+      const Ia = Iarr[i] * kProd;
+      if (Ia >= Ireq) return { mm2: SEC[i], Iallow: Ia, idx: i };
+    }
+    return { mm2: null, Iallow: Iarr[Iarr.length - 1] * kProd, idx: SEC.length - 1 };
+  }
+
+  /** 电压降 % */
+  function voltageDropPercent(material, mm2, I, L_m, U_V, threePhase, cosFi) {
+    const rCu = R_CU_MOHM_M[mm2] / 1000;
+    const x = X_MOHM_M[mm2] / 1000;
+    const r = material === "Cu" ? rCu : rCu * 1.61;
+    const sinFi = Math.sqrt(Math.max(0, 1 - cosFi * cosFi));
+    const L = L_m / 1000;
+    if (threePhase) {
+      const du = Math.sqrt(3) * I * L * (r * cosFi + x * sinFi);
+      return (du / U_V) * 100;
+    }
+    // 单相：来去两根导体
+    const du = 2 * I * L * (r * cosFi + x * sinFi);
+    return (du / U_V) * 100;
+  }
+
+  function fmt(x, d) {
+    if (x == null || Number.isNaN(x)) return "—";
+    const p = d != null ? d : 3;
+    return Number(x).toFixed(p);
+  }
+
+  function compute() {
+    const PkW = parseFloat(document.getElementById("p").value) || 0;
+    const Usel = document.getElementById("u").value;
+    const U = Usel === "380" ? 380 : 240;
+    const three = Usel === "380";
+    const cosFi = parseFloat(document.getElementById("pf").value) || 0.98;
+    const Lm = parseFloat(document.getElementById("len").value) || 1;
+    const duMax = parseFloat(document.getElementById("du").value) || 5;
+    const lay = document.getElementById("lay").value;
+    const tamb = parseFloat(document.getElementById("tamb").value) || 40;
+    const soilRho = parseFloat(document.getElementById("soil").value);
+    const nPar = parseInt(document.getElementById("parallel").value, 10) || 1;
+    const sp = document.getElementById("spacing").value;
+
+    document.getElementById("soilRow").style.display = lay === "buried" ? "block" : "none";
+
+    const P = PkW * 1000;
+    const I = three ? P / (Math.sqrt(3) * U * cosFi) : P / (U * cosFi);
+
+    const base = getBaseArrays(lay);
+    let kTemp = lay === "buried" ? interpTempK(TEMP_K_SOIL, tamb) : interpTempK(TEMP_K_AIR, tamb);
+    let kSoil = lay === "buried" ? soilFactor(soilRho) : 1;
+    let kPar = parallelFactor(nPar, sp);
+    if (lay === "buried") kPar = 1; // 表 D.0.5 注明不适用于单芯交流；多根直埋见表 D.0.4，本工具未展开
+
+    const kProd = kTemp * kSoil * kPar;
+
+    const rAl = minSectionForAmp(I, base.al, kProd);
+    const rCu = minSectionForAmp(I, base.cu, kProd);
+
+    let lines = [];
+    lines.push("【1】计算电流（持续工作电流）");
+    lines.push(three
+      ? `三相：I = P / (√3 × U × cosφ) = ${fmt(PkW, 2)}×10³ / (√3×${U}×${fmt(cosFi, 3)}) = ${fmt(I, 2)} A`
+      : `单相：I = P / (U × cosφ) = ${fmt(PkW, 2)}×10³ / (${U}×${fmt(cosFi, 3)}) = ${fmt(I, 2)} A`);
+    lines.push("");
+    lines.push("【2】载流量校正系数连乘（附录 D）");
+    lines.push(`环境温度 ${tamb}℃：Kθ = ${fmt(kTemp, 4)}（${lay === "buried" ? "土壤" : "空气"}，θm=90℃ 插值）`);
+    if (lay === "buried") {
+      lines.push(`土壤热阻 ρ=${soilRho} K·m/W：Kρ = ${fmt(kSoil, 4)}（相对表 C.0.1-4 基准 ρ=${SOIL_REF_BURIED_TABLE}，由表 D.0.3 比值）`);
+    } else {
+      lines.push(`并列敷设：n=${nPar}，${sp === "1d" ? "S=d" : sp === "2d" ? "S=2d" : "S=3d"} → K并 = ${fmt(kPar, 4)}（表 D.0.5）`);
+    }
+    lines.push(
+      lay === "buried"
+        ? `K总 = Kθ × Kρ × 1 = ${fmt(kTemp, 4)} × ${fmt(kSoil, 4)} = ${fmt(kProd, 4)}`
+        : `K总 = Kθ × 1 × K并 = ${fmt(kTemp, 4)} × ${fmt(kPar, 4)} = ${fmt(kProd, 4)}`
+    );
+    lines.push("");
+    lines.push("【3】按载流量选截面（附录 C，" + base.name + "）");
+    lines.push(`铝芯：最小规格 ≥ ${rAl.mm2 != null ? rAl.mm2 + " mm²" : "超出表格，请选更大截面或并联"}（校正后允许 ${fmt(rAl.Iallow, 1)} A）`);
+    lines.push(`铜芯：最小规格 ≥ ${rCu.mm2 != null ? rCu.mm2 + " mm²" : "超出表格"}（校正后允许 ${fmt(rCu.Iallow, 1)} A）`);
+    lines.push("");
+    lines.push("【4】电压降校验 ΔU（工程估算：R 按 90℃ 铜阻，铝按 1.61 倍；含近似电抗）");
+
+    function checkMat(label, mm2, mat) {
+      if (mm2 == null) return `${label}：无可用截面`;
+      const pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
+      const ok = pct <= duMax;
+      return `${label} ${mm2} mm²：ΔU ≈ ${fmt(pct, 2)} %（限值 ${duMax} %）${ok ? "→ 满足" : "→ 不满足，需放大截面"}`;
+    }
+    lines.push(checkMat("铝芯", rAl.mm2, "Al"));
+    lines.push(checkMat("铜芯", rCu.mm2, "Cu"));
+
+    // 若电压降超限，逐级放大至满足
+    function bumpForVdrop(mat, startIdx) {
+      let idx = Math.max(0, startIdx);
+      let mm2 = SEC[idx];
+      while (idx < SEC.length) {
+        mm2 = SEC[idx];
+        const pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
+        if (pct <= duMax) return { mm2, pct, idx };
+        idx++;
+      }
+      const last = SEC.length - 1;
+      return {
+        mm2: SEC[last],
+        pct: voltageDropPercent(mat, SEC[last], I, Lm, U, three, cosFi),
+        idx: last,
+      };
+    }
+
+    function finalizeMaterial(r, mat) {
+      if (r.mm2 == null) return { mm2: null, pct: null, Iallow: null };
+      const arr = mat === "Cu" ? base.cu : base.al;
+      let idx = r.idx;
+      let mm2 = r.mm2;
+      let pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
+      if (pct > duMax) {
+        const b = bumpForVdrop(mat, idx);
+        mm2 = b.mm2;
+        pct = b.pct;
+        idx = b.idx;
+      }
+      const Iallow = arr[idx] * kProd;
+      return { mm2, pct, Iallow };
+    }
+
+    const finCu = finalizeMaterial(rCu, "Cu");
+    const finAl = finalizeMaterial(rAl, "Al");
+
+    if (rAl.mm2 != null && voltageDropPercent("Al", rAl.mm2, I, Lm, U, three, cosFi) > duMax) {
+      lines.push(`→ 铝芯按电压降放大至 ${finAl.mm2} mm²（ΔU ≈ ${fmt(finAl.pct, 2)} %）`);
+    }
+    if (rCu.mm2 != null && voltageDropPercent("Cu", rCu.mm2, I, Lm, U, three, cosFi) > duMax) {
+      lines.push(`→ 铜芯按电压降放大至 ${finCu.mm2} mm²（ΔU ≈ ${fmt(finCu.pct, 2)} %）`);
+    }
+
+    document.getElementById("steps").textContent = lines.join("\n");
+
+    const sum = document.getElementById("summary");
+    function row(label, fin) {
+      if (!fin.mm2) {
+        return `<dt>${label}</dt><dd class="warn">超出表格，请并联或洽厂</dd>`;
+      }
+      const okVd = fin.pct != null && fin.pct <= duMax;
+      const okI = fin.Iallow != null && fin.Iallow >= I;
+      const ok = okVd && okI;
+      const ex = ok ? "" : "（校验未全满足）";
+      return `<dt>${label}${ex}</dt><dd>${fin.mm2} mm²　I≈${fmt(fin.Iallow, 1)} A　ΔU≈${fmt(fin.pct, 2)}%</dd>`;
+    }
+    sum.innerHTML = `<dl>${row("铜芯", finCu)}${row("铝芯", finAl)}</dl>`;
+  }
+
+  ["p", "u", "pf", "len", "du", "lay", "tamb", "soil", "parallel", "spacing"].forEach((id) => {
+    document.getElementById(id).addEventListener("input", compute);
+    document.getElementById(id).addEventListener("change", compute);
+  });
+  compute();
+})();
+  </script>
+</body>
+</html>
