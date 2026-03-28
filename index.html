@@ -21,7 +21,7 @@
     }
     .window {
       width: 100%;
-      max-width: 368px;
+      max-width: 380px;
       background: #fff;
       border: 1px solid #6d6d6d;
       border-radius: 4px;
@@ -55,7 +55,7 @@
     .panel { padding: 0 10px 10px; }
     .field {
       display: grid;
-      grid-template-columns: 108px 1fr;
+      grid-template-columns: 102px 1fr;
       gap: 6px 8px;
       align-items: center;
       margin-bottom: 6px;
@@ -65,6 +65,7 @@
       color: #333;
       line-height: 1.2;
     }
+    .field.hidden { display: none; }
     input, select {
       width: 100%;
       padding: 3px 5px;
@@ -80,7 +81,6 @@
       outline: 1px solid #0078d7;
       outline-offset: 0;
     }
-    /* 微信/iPhone：输入框字号≥16px 可减焦点放大；略加大点击区域 */
     @media (max-width: 480px) {
       body { padding: 10px 8px 20px; }
       input, select {
@@ -88,7 +88,7 @@
         min-height: 40px;
         height: auto;
       }
-      .field { grid-template-columns: 96px 1fr; }
+      .field { grid-template-columns: 92px 1fr; }
     }
     details {
       margin: 8px 10px 10px;
@@ -112,7 +112,7 @@
       word-break: break-word;
       font: 11px/1.45 Consolas, "Courier New", monospace;
       color: #222;
-      max-height: 220px;
+      max-height: 240px;
       overflow: auto;
     }
     .foot {
@@ -152,28 +152,84 @@
         <input id="du" type="number" min="0.1" max="20" step="0.1" value="5" />
       </div>
       <div class="field">
-        <label for="lay">敷设</label>
-        <select id="lay">
-          <option value="air" selected>空气 · 表 C.0.1-3</option>
-          <option value="buried">直埋 · 表 C.0.1-4</option>
+        <label for="cableTable">电缆·表号</label>
+        <select id="cableTable">
+          <option value="c011">PVC 1kV · 表 C.0.1-1 空气中</option>
+          <option value="c012">PVC 1kV · 表 C.0.1-2 直埋 (ρ=1.2)</option>
+          <option value="c013" selected>XLPE 1~3kV · 表 C.0.1-3 空气中</option>
+          <option value="c014">XLPE 1~3kV · 表 C.0.1-4 直埋 (ρ=2.0)</option>
+          <option value="c02">XLPE 6kV · 表 C.0.2</option>
+          <option value="c03">XLPE 10kV · 表 C.0.3</option>
+        </select>
+      </div>
+      <div class="field" id="rowPvc">
+        <label for="pvcCore">PVC 芯数</label>
+        <select id="pvcCore">
+          <option value="2">2 芯</option>
+          <option value="34" selected>3 或 4 芯</option>
+        </select>
+      </div>
+      <div class="field hidden" id="rowArmor">
+        <label for="pvcArmor">PVC 直埋</label>
+        <select id="pvcArmor">
+          <option value="no" selected>无钢铠</option>
+          <option value="yes">有钢铠</option>
+        </select>
+      </div>
+      <div class="field hidden" id="rowXlpe">
+        <label for="xlpeLay">XLPE 排列</label>
+        <select id="xlpeLay">
+          <option value="3c" selected>3 芯</option>
+          <option value="tss">单芯 品字形·接地 单侧</option>
+          <option value="tbs">单芯 品字形·接地 两侧</option>
+          <option value="hss">单芯 水平·单侧</option>
+          <option value="hbs">单芯 水平·两侧</option>
+        </select>
+      </div>
+      <div class="field hidden" id="rowHV">
+        <label for="hvLay">6/10kV 栏</label>
+        <select id="hvLay">
+          <option value="na" selected>无铠·空气中</option>
+          <option value="nb">无铠·直埋</option>
+          <option value="aa">有铠·空气中</option>
+          <option value="ab">有铠·直埋</option>
         </select>
       </div>
       <div class="field">
         <label for="tamb">环境 (℃)</label>
         <input id="tamb" type="number" step="1" value="40" />
       </div>
-      <div class="field" id="soilRow">
+      <div class="field hidden" id="rowSoil">
         <label for="soil">土壤 ρ</label>
         <select id="soil">
-          <option value="2.0" selected>2.0</option>
           <option value="0.8">0.8</option>
-          <option value="1.2">1.2</option>
+          <option value="1.2" id="soilOpt12">1.2 (C.0.1-2 基准)</option>
           <option value="1.5">1.5</option>
+          <option value="2.0" id="soilOpt20" selected>2.0 (C.0.1-4 基准)</option>
           <option value="3.0">3.0</option>
         </select>
       </div>
-      <div class="field">
-        <label for="parallel">并联根数</label>
+      <div class="field hidden" id="rowBurPar">
+        <label for="burDist">直埋净距 mm</label>
+        <select id="burDist">
+          <option value="100" selected>100（表 D.0.4）</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+        </select>
+      </div>
+      <div class="field hidden" id="rowBurCount">
+        <label for="burParallel">直埋并列回路</label>
+        <select id="burParallel">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <div class="field hidden" id="rowAirPar">
+        <label for="parallel">空气并列根数</label>
         <select id="parallel">
           <option value="1" selected>1</option>
           <option value="2">2</option>
@@ -183,7 +239,7 @@
           <option value="6">6</option>
         </select>
       </div>
-      <div class="field">
+      <div class="field hidden" id="rowSpacing">
         <label for="spacing">间距 S/d</label>
         <select id="spacing">
           <option value="1d">1</option>
@@ -191,49 +247,123 @@
           <option value="3d">3</option>
         </select>
       </div>
+      <div class="field" id="rowBridge">
+        <label for="bridge">桥架多层 D.0.6</label>
+        <select id="bridge">
+          <option value="0" selected>不用</option>
+          <option value="l1">梯架·1 层 0.80</option>
+          <option value="l2">梯架·2 层 0.65</option>
+          <option value="l3">梯架·3 层 0.55</option>
+          <option value="l4">梯架·4 层 0.50</option>
+          <option value="t1">托盘·1 层 0.70</option>
+          <option value="t2">托盘·2 层 0.55</option>
+          <option value="t3">托盘·3 层 0.50</option>
+          <option value="t4">托盘·4 层 0.45</option>
+        </select>
+      </div>
+      <div class="field" id="rowOutdoor">
+        <label for="outdoor">户外无遮阳 D.0.7</label>
+        <select id="outdoor">
+          <option value="0" selected>否</option>
+          <option value="1">是（1kV/6kV 按截面查表）</option>
+        </select>
+      </div>
     </div>
     <details>
       <summary>计算过程</summary>
       <pre id="steps" class="steps-pre"></pre>
     </details>
-    <p class="foot">辅助计算，工程以产品资料与规范正文为准。ρ 单位 K·m/W；并联校正见 D.0.5（仅空气）。</p>
+    <p class="foot">附录 C 各表值为<strong>铝芯</strong>载流量；<strong>铜芯 = 铝芯 × 1.29</strong>（规范各表注 1）。C.0.1-3 中 3 芯 400mm² 及以上表中未列，程序按同表<strong>单芯品字形单侧</strong>铝值延续。电压降、谐波与短路未计。</p>
   </div>
   <script>
 (function () {
   "use strict";
 
-  // 附录 C 表 C.0.1-3：1kV～3kV XLPE，空气中，3 芯（铝 / 铜），A
-  const SEC = [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
-  const I_AIR_AL = [91, 114, 146, 178, 214, 246, 278, 319, 378, 419, 611, 712, 826];
-  const I_AIR_CU = [118, 150, 182, 228, 273, 314, 360, 410, 483, 552, 771, 885, 1008];
+  const CU_MULT = 1.29;
 
-  // 附录 C 表 C.0.1-4：直埋 3 芯 品字形 单侧（铝 / 铜），ρ=2.0，25℃ 环境
-  const I_BUR_AL = [91, 113, 134, 165, 195, 221, 247, 278, 321, 365, 456, 517, 582];
-  const I_BUR_CU = [117, 143, 169, 208, 247, 282, 321, 356, 408, 469, 574, 635, 704];
+  /** 表 C.0.1-1 铝 空气中 40℃ 70℃ */
+  const C011_SEC2 = [2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
+  const C011_AL2 = [18, 24, 31, 44, 60, 79, 95, 121, 147, 181, 211, 242];
+  const C011_SEC34 = [2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
+  const C011_AL34 = [15, 21, 27, 38, 52, 69, 82, 104, 129, 155, 181, 211, 246, 294, 328];
 
-  // 附录 D 表 D.0.1：θm=90℃，空气中
-  const TEMP_K_AIR = { 30: 1.09, 35: 1.05, 40: 1.0, 45: 0.94 };
-  // θm=90℃，土壤
-  const TEMP_K_SOIL = { 20: 1.04, 25: 1.0, 30: 0.96, 35: 0.92 };
+  /** 表 C.0.1-2 铝 直埋 25℃ ρ=1.2 */
+  const C012_SEC = [4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
+  const C012_SEC2 = [4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
+  const C012_2_NO = [36, 45, 62, 83, 105, 136, 157, 184, 226, 254, 287];
+  const C012_2_YES = [34, 43, 59, 79, 100, 131, 152, 180, 217, 249, 273];
+  const C012_34_NO = [31, 38, 53, 70, 90, 110, 134, 157, 189, 212, 242, 273, 319, 347];
+  const C012_34_YES = [30, 37, 50, 68, 87, 105, 129, 152, 180, 207, 237, 264, 310, 347];
 
-  // 附录 D 表 D.0.3（相对 ρ=1.2 的系数）；表 C.0.1-4 基准为 ρ=2.0 → 相对 1.2 的系数取 0.87
+  /** 表 C.0.1-3 铝 空气 40℃ 90℃ — 400+ 3 芯按品字形单侧补全 */
+  const C013_SEC = [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 630];
+  const C013_3C = [91, 114, 146, 178, 214, 246, 278, 319, 378, 419, 611, 712, 826];
+  const C013_TSS = [100, 127, 155, 196, 241, 283, 328, 372, 442, 506, 611, 712, 826];
+  const C013_TBS = [100, 127, 155, 196, 241, 278, 319, 365, 424, 493, 579, 661, 734];
+  const C013_HSS = [114, 146, 173, 228, 278, 319, 365, 424, 502, 588, 707, 830, 963];
+  const C013_HBS = [114, 141, 168, 214, 260, 292, 337, 369, 424, 479, 546, 611, 680];
+
+  /** 表 C.0.1-4 铝 直埋 25℃ ρ=2.0 — 3 芯 400+ 用品字形单侧 */
+  const C014_3C = [91, 113, 134, 165, 195, 221, 247, 278, 321, 365, 456, 517, 582];
+  const C014_TSS = [104, 117, 139, 174, 208, 239, 269, 300, 348, 391, 456, 517, 582];
+  const C014_HSS = [113, 134, 160, 195, 230, 261, 295, 330, 378, 430, 500, 565, 635];
+
+  /** 表 C.0.2 铝 6kV 3 芯 */
+  const C02_SEC = [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
+  const C02_NA = [null, 114, 141, 173, 209, 246, 277, 323, 378, 432, 505, 584];
+  const C02_NB = [87, 105, 123, 148, 178, 200, 232, 262, 300, 343, 380, 432];
+  const C02_AA = [null, null, null, null, null, null, null, null, null, null, null, null];
+  const C02_AB = [87, 102, 118, 148, 178, 200, 222, 252, 295, 333, 370, 422];
+
+  /** 表 C.0.3 铝 10kV 3 芯 */
+  const C03_SEC = [25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
+  const C03_NA = [100, 123, 146, 178, 219, 251, 283, 324, 378, 433, 506, 579];
+  const C03_NB = [90, 110, 125, 152, 182, 205, 223, 252, 292, 332, 378, 428];
+  const C03_AA = [100, 123, 141, 173, 214, 246, 278, 320, 373, 428, 501, 574];
+  const C03_AB = [90, 105, 120, 152, 182, 205, 219, 247, 292, 328, 374, 424];
+
+    /** D.0.1 空气中 */
+  const TK_AIR_70 = { 30: 1.15, 35: 1.08, 40: 1.0, 45: 0.91 };
+  const TK_AIR_90 = { 30: 1.09, 35: 1.05, 40: 1.0, 45: 0.94 };
+  const TK_SOIL_70 = { 20: 1.05, 25: 1.0, 30: 0.94, 35: 0.88 };
+  const TK_SOIL_90 = { 20: 1.04, 25: 1.0, 30: 0.96, 35: 0.92 };
+
   const SOIL_K = { 0.8: 1.05, 1.2: 1.0, 1.5: 0.93, 2.0: 0.87, 3.0: 0.75 };
-  const SOIL_REF_BURIED_TABLE = 2.0;
 
-  // 附录 D 表 D.0.5
   const PARALLEL_K = {
     "1d": { 2: 1.0, 3: 0.9, 4: 0.85, 5: 0.82, 6: 0.81 },
     "2d": { 2: 1.0, 3: 1.0, 4: 0.98, 5: 0.95, 6: 0.93 },
     "3d": { 2: 1.0, 3: 1.0, 4: 1.0, 5: 0.98, 6: 0.97 },
   };
 
-  /** 90℃ 近似交流电阻 mΩ/m（铜，三芯 XLPE 工程常用量级，用于电压降） */
+  const BURIED_GROUP_K = {
+    100: { 1: 1, 2: 0.9, 3: 0.85, 4: 0.8, 5: 0.78, 6: 0.75 },
+    200: { 1: 1, 2: 0.92, 3: 0.87, 4: 0.84, 5: 0.82, 6: 0.81 },
+    300: { 1: 1, 2: 0.93, 3: 0.9, 4: 0.87, 5: 0.86, 6: 0.85 },
+  };
+
+  /** D.0.7 户外无遮阳，以室内空气中为基准 — 1kV 三芯 */
+  function kD07_1kv3(mm2) {
+    const m = {
+      95: 0.9, 120: 0.98, 150: 0.97, 185: 0.96, 240: 0.94,
+    };
+    return m[mm2] != null ? m[mm2] : 1.0;
+  }
+  /** 6kV 三芯 */
+  function kD07_6kv3(mm2) {
+    const m = {
+      35: 0.96, 50: 0.95, 70: 0.94, 95: 0.93, 120: 0.92, 150: 0.91, 185: 0.9, 240: 0.88,
+    };
+    return m[mm2] != null ? m[mm2] : 1.0;
+  }
+
   const R_CU_MOHM_M = {
+    2.5: 68, 4: 42.5, 6: 28.3, 10: 17.0, 16: 10.6,
     25: 9.45, 35: 6.75, 50: 4.95, 70: 3.45, 95: 2.52, 120: 2.01,
     150: 1.62, 185: 1.29, 240: 1.0, 300: 0.82, 400: 0.63, 500: 0.51, 630: 0.41,
   };
-  /** 电抗约值 mΩ/m（三芯 1kV，相间距中等） */
   const X_MOHM_M = {
+    2.5: 0.11, 4: 0.105, 6: 0.1, 10: 0.1, 16: 0.095,
     25: 0.1, 35: 0.095, 50: 0.09, 70: 0.085, 95: 0.08, 120: 0.08,
     150: 0.075, 185: 0.075, 240: 0.07, 300: 0.069, 400: 0.067, 500: 0.065, 630: 0.063,
   };
@@ -246,59 +376,226 @@
     let i = 0;
     while (i < keys.length - 1 && keys[i + 1] < t) i++;
     const t0 = keys[i], t1 = keys[i + 1];
-    const k0 = table[t0], k1 = table[t1];
-    return k0 + ((k1 - k0) * (t - t0)) / (t1 - t0);
+    return table[t0] + ((table[t1] - table[t0]) * (t - t0)) / (t1 - t0);
   }
 
-  function soilFactor(userRho) {
+  function soilFactorRelative(userRho, baseRho) {
     const ku = SOIL_K[userRho];
-    const k0 = SOIL_K[SOIL_REF_BURIED_TABLE];
+    const k0 = SOIL_K[baseRho];
     if (ku == null || k0 == null) return 1;
     return ku / k0;
   }
 
-  function parallelFactor(n, spacingKey) {
+  function parallelAirFactor(n, spacingKey) {
     if (n === 1) return 1;
     const row = PARALLEL_K[spacingKey] || PARALLEL_K["2d"];
     return row[n] != null ? row[n] : row[6];
   }
 
-  function getBaseArrays(lay) {
-    if (lay === "buried") return { al: I_BUR_AL, cu: I_BUR_CU, name: "表 C.0.1-4（直埋，3 芯）" };
-    return { al: I_AIR_AL, cu: I_AIR_CU, name: "表 C.0.1-3（空气中，3 芯）" };
+  function buriedGroupFactor(distMm, n) {
+    const row = BURIED_GROUP_K[distMm] || BURIED_GROUP_K[100];
+    return row[n] != null ? row[n] : row[6];
   }
 
-  function minSectionForAmp(Ireq, Iarr, kProd) {
-    for (let i = 0; i < SEC.length; i++) {
-      const Ia = Iarr[i] * kProd;
-      if (Ia >= Ireq) return { mm2: SEC[i], Iallow: Ia, idx: i };
+  function bridgeFactor(code) {
+    const map = {
+      l1: 0.8, l2: 0.65, l3: 0.55, l4: 0.5,
+      t1: 0.7, t2: 0.55, t3: 0.5, t4: 0.45,
+    };
+    return map[code] != null ? map[code] : 1;
+  }
+
+  /** 根据选项返回 { sections, al, name, thetaM, refSoilT, soilBase, isBuried, isAir, tableId } */
+  function getProfile() {
+    const t = document.getElementById("cableTable").value;
+    const pvcCore = document.getElementById("pvcCore").value;
+    const armor = document.getElementById("pvcArmor").value === "yes";
+    const xl = document.getElementById("xlpeLay").value;
+    const hv = document.getElementById("hvLay").value;
+
+    if (t === "c011") {
+      const two = pvcCore === "2";
+      return {
+        sections: two ? C011_SEC2 : C011_SEC34,
+        al: two ? C011_AL2 : C011_AL34,
+        name: "表 C.0.1-1（PVC，空气，" + (two ? "2 芯" : "3 或 4 芯") + "）",
+        thetaM: 70,
+        refSoilT: null,
+        soilBase: null,
+        isBuried: false,
+        isAir: true,
+        tableId: "c011",
+      };
     }
-    return { mm2: null, Iallow: Iarr[Iarr.length - 1] * kProd, idx: SEC.length - 1 };
+    if (t === "c012") {
+      const two = pvcCore === "2";
+      let sec, al;
+      if (two) {
+        sec = C012_SEC2;
+        al = armor ? C012_2_YES : C012_2_NO;
+      } else {
+        sec = C012_SEC;
+        al = armor ? C012_34_YES : C012_34_NO;
+      }
+      return {
+        sections: sec,
+        al: al,
+        name: "表 C.0.1-2（PVC，直埋 ρ=1.2，" + (armor ? "有铠" : "无铠") + "，" + (two ? "2 芯" : "3 或 4 芯") + "）",
+        thetaM: 70,
+        refSoilT: 25,
+        soilBase: 1.2,
+        isBuried: true,
+        isAir: false,
+        tableId: "c012",
+      };
+    }
+    if (t === "c013") {
+      let al;
+      let note = "";
+      if (xl === "3c") al = C013_3C;
+      else if (xl === "tss") al = C013_TSS;
+      else if (xl === "tbs") al = C013_TBS;
+      else if (xl === "hss") al = C013_HSS;
+      else al = C013_HBS;
+      return {
+        sections: C013_SEC,
+        al: al,
+        name: "表 C.0.1-3（XLPE 空气，" + xl + "）" + note,
+        thetaM: 90,
+        refSoilT: null,
+        soilBase: null,
+        isBuried: false,
+        isAir: true,
+        tableId: "c013",
+      };
+    }
+    if (t === "c014") {
+      let al;
+      if (xl === "3c") al = C014_3C;
+      else if (xl === "tss" || xl === "tbs") al = C014_TSS;
+      else al = C014_HSS;
+      return {
+        sections: C013_SEC,
+        al: al,
+        name: "表 C.0.1-4（XLPE 直埋 ρ=2.0，" + xl + "）",
+        thetaM: 90,
+        refSoilT: 25,
+        soilBase: 2.0,
+        isBuried: true,
+        isAir: false,
+        tableId: "c014",
+      };
+    }
+    if (t === "c02") {
+      const al = hv === "na" ? C02_NA : hv === "nb" ? C02_NB : hv === "aa" ? C02_AA : C02_AB;
+      const buried = hv === "nb" || hv === "ab";
+      return {
+        sections: C02_SEC,
+        al: al,
+        name: "表 C.0.2（6kV，" + hv + "）",
+        thetaM: 90,
+        refSoilT: buried ? 25 : null,
+        soilBase: buried ? 2.0 : null,
+        isBuried: buried,
+        isAir: !buried,
+        tableId: "c02",
+      };
+    }
+    const al = hv === "na" ? C03_NA : hv === "nb" ? C03_NB : hv === "aa" ? C03_AA : C03_AB;
+    const buried = hv === "nb" || hv === "ab";
+    return {
+      sections: C03_SEC,
+      al: al,
+      name: "表 C.0.3（10kV，" + hv + "）",
+      thetaM: 90,
+      refSoilT: buried ? 25 : null,
+      soilBase: buried ? 2.0 : null,
+      isBuried: buried,
+      isAir: !buried,
+      tableId: "c03",
+    };
   }
 
-  /** 电压降 % */
+  /** kProdFn(i) 可对每档截面变化（如 D.0.7）；铜芯允许电流 = 铝芯表值×K总×1.29 */
+  function minSectionMaterial(Ireq, sections, alArr, kProdFn, forCopper) {
+    for (let i = 0; i < sections.length; i++) {
+      const b = alArr[i];
+      if (b == null || b <= 0) continue;
+      const kp = kProdFn(i);
+      const Ial = b * kp;
+      const Icu = b * kp * CU_MULT;
+      if (forCopper) {
+        if (Icu >= Ireq) return { mm2: sections[i], IallowAl: Ial, IallowCu: Icu, idx: i, sections, alArr };
+      } else {
+        if (Ial >= Ireq) return { mm2: sections[i], IallowAl: Ial, IallowCu: Icu, idx: i, sections, alArr };
+      }
+    }
+    let lastIdx = -1;
+    for (let j = sections.length - 1; j >= 0; j--) {
+      if (alArr[j] != null && alArr[j] > 0) { lastIdx = j; break; }
+    }
+    if (lastIdx < 0) return { mm2: null, IallowAl: 0, IallowCu: 0, idx: 0, sections, alArr };
+    const kp0 = kProdFn(lastIdx);
+    const b0 = alArr[lastIdx];
+    return {
+      mm2: null,
+      IallowAl: b0 * kp0,
+      IallowCu: b0 * kp0 * CU_MULT,
+      idx: lastIdx,
+      sections,
+      alArr,
+    };
+  }
+
   function voltageDropPercent(material, mm2, I, L_m, U_V, threePhase, cosFi) {
-    const rCu = R_CU_MOHM_M[mm2] / 1000;
-    const x = X_MOHM_M[mm2] / 1000;
+    const rCu = (R_CU_MOHM_M[mm2] != null ? R_CU_MOHM_M[mm2] : 9.45) / 1000;
+    const x = (X_MOHM_M[mm2] != null ? X_MOHM_M[mm2] : 0.08) / 1000;
     const r = material === "Cu" ? rCu : rCu * 1.61;
     const sinFi = Math.sqrt(Math.max(0, 1 - cosFi * cosFi));
     const L = L_m / 1000;
     if (threePhase) {
-      const du = Math.sqrt(3) * I * L * (r * cosFi + x * sinFi);
-      return (du / U_V) * 100;
+      return (Math.sqrt(3) * I * L * (r * cosFi + x * sinFi) / U_V) * 100;
     }
-    // 单相：来去两根导体
-    const du = 2 * I * L * (r * cosFi + x * sinFi);
-    return (du / U_V) * 100;
+    return (2 * I * L * (r * cosFi + x * sinFi) / U_V) * 100;
   }
 
   function fmt(x, d) {
     if (x == null || Number.isNaN(x)) return "—";
-    const p = d != null ? d : 3;
-    return Number(x).toFixed(p);
+    return Number(x).toFixed(d != null ? d : 3);
+  }
+
+  function syncUI() {
+    const t = document.getElementById("cableTable").value;
+    const showPvc = t === "c011" || t === "c012";
+    const showArm = t === "c012";
+    const showXl = t === "c013" || t === "c014";
+    const showHv = t === "c02" || t === "c03";
+    document.getElementById("rowPvc").classList.toggle("hidden", !showPvc);
+    document.getElementById("rowArmor").classList.toggle("hidden", !showArm);
+    document.getElementById("rowXlpe").classList.toggle("hidden", !showXl);
+    document.getElementById("rowHV").classList.toggle("hidden", !showHv);
+
+    const prof = getProfile();
+    const soil = document.getElementById("rowSoil");
+    soil.classList.toggle("hidden", prof.soilBase == null);
+    document.getElementById("rowBurPar").classList.toggle("hidden", !prof.isBuried);
+    document.getElementById("rowBurCount").classList.toggle("hidden", !prof.isBuried);
+    document.getElementById("rowAirPar").classList.toggle("hidden", !prof.isAir);
+    document.getElementById("rowSpacing").classList.toggle("hidden", !prof.isAir || parseInt(document.getElementById("parallel").value, 10) <= 1);
+
+    const outdoorRow = document.getElementById("rowOutdoor");
+    const osel = document.getElementById("outdoor");
+    if (t === "c03") {
+      outdoorRow.classList.add("hidden");
+      osel.value = "0";
+    } else {
+      outdoorRow.classList.remove("hidden");
+    }
   }
 
   function compute() {
+    syncUI();
+    const prof = getProfile();
     const PkW = parseFloat(document.getElementById("p").value) || 0;
     const Usel = document.getElementById("u").value;
     const U = Usel === "380" ? 380 : 240;
@@ -306,125 +603,141 @@
     const cosFi = parseFloat(document.getElementById("pf").value) || 0.98;
     const Lm = parseFloat(document.getElementById("len").value) || 1;
     const duMax = parseFloat(document.getElementById("du").value) || 5;
-    const lay = document.getElementById("lay").value;
-    const tamb = parseFloat(document.getElementById("tamb").value) || 40;
+    let tamb = parseFloat(document.getElementById("tamb").value) || 40;
     const soilRho = parseFloat(document.getElementById("soil").value);
     const nPar = parseInt(document.getElementById("parallel").value, 10) || 1;
     const sp = document.getElementById("spacing").value;
+    const burN = parseInt(document.getElementById("burParallel").value, 10) || 1;
+    const burDist = parseInt(document.getElementById("burDist").value, 10) || 100;
+    const bridgeCode = document.getElementById("bridge").value;
+    const useOutdoor = document.getElementById("outdoor").value === "1";
+    const cableTab = document.getElementById("cableTable").value;
 
-    document.getElementById("soilRow").style.display = lay === "buried" ? "block" : "none";
+    if (prof.isBuried && prof.refSoilT != null) {
+      if (document.getElementById("tamb").value === "" || (prof.tableId === "c012" && tamb === 40)) {
+        document.getElementById("tamb").value = "25";
+        tamb = 25;
+      }
+    }
 
     const P = PkW * 1000;
     const I = three ? P / (Math.sqrt(3) * U * cosFi) : P / (U * cosFi);
 
-    const base = getBaseArrays(lay);
-    let kTemp = lay === "buried" ? interpTempK(TEMP_K_SOIL, tamb) : interpTempK(TEMP_K_AIR, tamb);
-    let kSoil = lay === "buried" ? soilFactor(soilRho) : 1;
-    let kPar = parallelFactor(nPar, sp);
-    if (lay === "buried") kPar = 1; // 表 D.0.5 注明不适用于单芯交流；多根直埋见表 D.0.4，本工具未展开
+    let kTemp;
+    if (prof.isBuried && prof.refSoilT != null) {
+      kTemp = prof.thetaM === 70
+        ? interpTempK(TK_SOIL_70, tamb)
+        : interpTempK(TK_SOIL_90, tamb);
+    } else {
+      kTemp = prof.thetaM === 70
+        ? interpTempK(TK_AIR_70, tamb)
+        : interpTempK(TK_AIR_90, tamb);
+    }
 
-    const kProd = kTemp * kSoil * kPar;
+    let kSoil = 1;
+    if (prof.soilBase != null) kSoil = soilFactorRelative(soilRho, prof.soilBase);
 
-    const rAl = minSectionForAmp(I, base.al, kProd);
-    const rCu = minSectionForAmp(I, base.cu, kProd);
+    let kAirPar = 1;
+    if (prof.isAir) kAirPar = parallelAirFactor(nPar, sp);
+
+    let kBurGroup = 1;
+    if (prof.isBuried && burN > 1) kBurGroup = buriedGroupFactor(burDist, burN);
+
+    const kBrid = bridgeFactor(bridgeCode);
+    const kCore = kTemp * kSoil * kAirPar * kBurGroup * kBrid;
+
+    const sections = prof.sections;
+    const alArr = prof.al;
+
+    function kProdFn(i) {
+      let kp = kCore;
+      if (useOutdoor && prof.isAir) {
+        if (cableTab === "c011" || cableTab === "c013") kp *= kD07_1kv3(sections[i]);
+        else if (cableTab === "c02") kp *= kD07_6kv3(sections[i]);
+      }
+      return kp;
+    }
+
+    const rAl = minSectionMaterial(I, sections, alArr, kProdFn, false);
+    const rCu = minSectionMaterial(I, sections, alArr, kProdFn, true);
 
     let lines = [];
-    lines.push("【1】计算电流（持续工作电流）");
-    lines.push(three
-      ? `三相：I = P / (√3 × U × cosφ) = ${fmt(PkW, 2)}×10³ / (√3×${U}×${fmt(cosFi, 3)}) = ${fmt(I, 2)} A`
-      : `单相：I = P / (U × cosφ) = ${fmt(PkW, 2)}×10³ / (${U}×${fmt(cosFi, 3)}) = ${fmt(I, 2)} A`);
+    lines.push("【1】工作电流 I = " + fmt(I, 2) + " A");
     lines.push("");
-    lines.push("【2】载流量校正系数连乘（附录 D）");
-    lines.push(`环境温度 ${tamb}℃：Kθ = ${fmt(kTemp, 4)}（${lay === "buried" ? "土壤" : "空气"}，θm=90℃ 插值）`);
-    if (lay === "buried") {
-      lines.push(`土壤热阻 ρ=${soilRho} K·m/W：Kρ = ${fmt(kSoil, 4)}（相对表 C.0.1-4 基准 ρ=${SOIL_REF_BURIED_TABLE}，由表 D.0.3 比值）`);
-    } else {
-      lines.push(`并列敷设：n=${nPar}，${sp === "1d" ? "S=d" : sp === "2d" ? "S=2d" : "S=3d"} → K并 = ${fmt(kPar, 4)}（表 D.0.5）`);
+    lines.push("【2】校正系数（附录 D）");
+    lines.push("θm=" + prof.thetaM + "℃：" + (prof.isBuried ? "土壤" : "空气") + " Kθ = " + fmt(kTemp, 4));
+    if (prof.soilBase != null) {
+      lines.push("Kρ（相对表基准 ρ=" + prof.soilBase + "）= " + fmt(kSoil, 4));
     }
-    lines.push(
-      lay === "buried"
-        ? `K总 = Kθ × Kρ × 1 = ${fmt(kTemp, 4)} × ${fmt(kSoil, 4)} = ${fmt(kProd, 4)}`
-        : `K总 = Kθ × 1 × K并 = ${fmt(kTemp, 4)} × ${fmt(kPar, 4)} = ${fmt(kProd, 4)}`
-    );
-    lines.push("");
-    lines.push("【3】按载流量选截面（附录 C，" + base.name + "）");
-    lines.push(`铝芯：最小规格 ≥ ${rAl.mm2 != null ? rAl.mm2 + " mm²" : "超出表格，请选更大截面或并联"}（校正后允许 ${fmt(rAl.Iallow, 1)} A）`);
-    lines.push(`铜芯：最小规格 ≥ ${rCu.mm2 != null ? rCu.mm2 + " mm²" : "超出表格"}（校正后允许 ${fmt(rCu.Iallow, 1)} A）`);
-    lines.push("");
-    lines.push("【4】电压降校验 ΔU（工程估算：R 按 90℃ 铜阻，铝按 1.61 倍；含近似电抗）");
-
-    function checkMat(label, mm2, mat) {
-      if (mm2 == null) return `${label}：无可用截面`;
-      const pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
-      const ok = pct <= duMax;
-      return `${label} ${mm2} mm²：ΔU ≈ ${fmt(pct, 2)} %（限值 ${duMax} %）${ok ? "→ 满足" : "→ 不满足，需放大截面"}`;
+    if (prof.isAir && nPar > 1) lines.push("空气并列 D.0.5：K并 = " + fmt(kAirPar, 4));
+    if (prof.isBuried && burN > 1) lines.push("直埋并列 D.0.4（净距 " + burDist + "mm）：K并埋 = " + fmt(kBurGroup, 4));
+    if (kBrid < 1) lines.push("桥架多层 D.0.6：K桥 = " + fmt(kBrid, 4));
+    if (useOutdoor && prof.isAir && (cableTab === "c011" || cableTab === "c013" || cableTab === "c02")) {
+      lines.push("户外无遮阳 D.0.7：按截面逐档乘 K日（1kV/6kV 表），已计入选截面");
     }
-    lines.push(checkMat("铝芯", rAl.mm2, "Al"));
-    lines.push(checkMat("铜芯", rCu.mm2, "Cu"));
+    lines.push("K总（不含日射，日射已进逐档）：" + fmt(kTemp * kSoil * kAirPar * kBurGroup * kBrid, 4));
+    lines.push("");
+    lines.push("【3】载流量：附录 " + prof.name);
+    lines.push("铝芯表值 × K；铜芯 = 铝 × " + CU_MULT + "（规范表注 1）");
+    lines.push("铝≥ " + (rAl.mm2 != null ? rAl.mm2 + " mm²（允许 " + fmt(rAl.IallowAl, 1) + " A）" : "超出表"));
+    lines.push("铜≥ " + (rCu.mm2 != null ? rCu.mm2 + " mm²（允许 " + fmt(rCu.IallowCu, 1) + " A）" : "超出表"));
+    lines.push("");
+    lines.push("【4】电压降校验");
 
-    // 若电压降超限，逐级放大至满足
-    function bumpForVdrop(mat, startIdx) {
-      let idx = Math.max(0, startIdx);
-      let mm2 = SEC[idx];
-      while (idx < SEC.length) {
-        mm2 = SEC[idx];
+    function bumpVd(mat, startIdx, secArr, alA) {
+      for (let idx = Math.max(0, startIdx); idx < secArr.length; idx++) {
+        if (alA[idx] == null || alA[idx] <= 0) continue;
+        const mm2 = secArr[idx];
         const pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
         if (pct <= duMax) return { mm2, pct, idx };
-        idx++;
       }
-      const last = SEC.length - 1;
-      return {
-        mm2: SEC[last],
-        pct: voltageDropPercent(mat, SEC[last], I, Lm, U, three, cosFi),
-        idx: last,
-      };
+      let j = secArr.length - 1;
+      while (j > 0 && (alA[j] == null || alA[j] <= 0)) j--;
+      return { mm2: secArr[j], pct: voltageDropPercent(mat, secArr[j], I, Lm, U, three, cosFi), idx: j };
     }
 
-    function finalizeMaterial(r, mat) {
+    function finalize(r, forCopper) {
       if (r.mm2 == null) return { mm2: null, pct: null, Iallow: null };
-      const arr = mat === "Cu" ? base.cu : base.al;
       let idx = r.idx;
       let mm2 = r.mm2;
-      let pct = voltageDropPercent(mat, mm2, I, Lm, U, three, cosFi);
+      let pct = voltageDropPercent(forCopper ? "Cu" : "Al", mm2, I, Lm, U, three, cosFi);
       if (pct > duMax) {
-        const b = bumpForVdrop(mat, idx);
+        const b = bumpVd(forCopper ? "Cu" : "Al", idx, sections, alArr);
         mm2 = b.mm2;
         pct = b.pct;
         idx = b.idx;
       }
-      const Iallow = arr[idx] * kProd;
+      const kp = kProdFn(idx);
+      const Iallow = forCopper ? alArr[idx] * kp * CU_MULT : alArr[idx] * kp;
       return { mm2, pct, Iallow };
     }
 
-    const finCu = finalizeMaterial(rCu, "Cu");
-    const finAl = finalizeMaterial(rAl, "Al");
+    const finAl = finalize(rAl, false);
+    const finCu = finalize(rCu, true);
 
-    if (rAl.mm2 != null && voltageDropPercent("Al", rAl.mm2, I, Lm, U, three, cosFi) > duMax) {
-      lines.push(`→ 铝芯按电压降放大至 ${finAl.mm2} mm²（ΔU ≈ ${fmt(finAl.pct, 2)} %）`);
-    }
-    if (rCu.mm2 != null && voltageDropPercent("Cu", rCu.mm2, I, Lm, U, three, cosFi) > duMax) {
-      lines.push(`→ 铜芯按电压降放大至 ${finCu.mm2} mm²（ΔU ≈ ${fmt(finCu.pct, 2)} %）`);
-    }
+    lines.push("铝 " + (rAl.mm2 != null ? rAl.mm2 : "—") + " mm²：ΔU≈" + (rAl.mm2 != null ? fmt(voltageDropPercent("Al", rAl.mm2, I, Lm, U, three, cosFi), 2) : "—") + "%");
+    lines.push("铜 " + (rCu.mm2 != null ? rCu.mm2 : "—") + " mm²：ΔU≈" + (rCu.mm2 != null ? fmt(voltageDropPercent("Cu", rCu.mm2, I, Lm, U, three, cosFi), 2) : "—") + "%");
 
     document.getElementById("steps").textContent = lines.join("\n");
 
     const sum = document.getElementById("summary");
     function row(label, fin) {
-      if (!fin.mm2) {
-        return `<dt>${label}</dt><dd class="warn">超出表格，请并联或洽厂</dd>`;
-      }
+      if (!fin.mm2) return `<dt>${label}</dt><dd class="warn">超出表格或无铠空气数据</dd>`;
       const okVd = fin.pct != null && fin.pct <= duMax;
-      const okI = fin.Iallow != null && fin.Iallow >= I;
+      const okI = fin.Iallow != null && fin.Iallow >= I - 1e-6;
       const ok = okVd && okI;
-      const ex = ok ? "" : "（校验未全满足）";
-      return `<dt>${label}${ex}</dt><dd>${fin.mm2} mm²　I≈${fmt(fin.Iallow, 1)} A　ΔU≈${fmt(fin.pct, 2)}%</dd>`;
+      return `<dt>${label}${ok ? "" : "（注意）"}</dt><dd>${fin.mm2} mm²　I≈${fmt(fin.Iallow, 1)} A　ΔU≈${fmt(fin.pct, 2)}%</dd>`;
     }
-    sum.innerHTML = `<dl>${row("铜芯", finCu)}${row("铝芯", finAl)}</dl>`;
+    sum.innerHTML = "<dl>" + row("铜芯", finCu) + row("铝芯", finAl) + "</dl>";
   }
 
-  ["p", "u", "pf", "len", "du", "lay", "tamb", "soil", "parallel", "spacing"].forEach((id) => {
-    document.getElementById(id).addEventListener("input", compute);
-    document.getElementById(id).addEventListener("change", compute);
+  const ids = ["p", "u", "pf", "len", "du", "cableTable", "pvcCore", "pvcArmor", "xlpeLay", "hvLay", "tamb", "soil", "burDist", "burParallel", "parallel", "spacing", "bridge", "outdoor"];
+  ids.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", compute);
+      el.addEventListener("change", compute);
+    }
   });
   compute();
 })();
