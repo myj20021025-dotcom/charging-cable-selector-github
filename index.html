@@ -121,29 +121,6 @@
       color: #555;
       line-height: 1.4;
     }
-    details.deploy {
-      margin: 0 10px 12px;
-      border: 1px dashed #999;
-      border-radius: 2px;
-      background: #fffef5;
-      font-size: 11px;
-    }
-    details.deploy summary {
-      padding: 6px 8px;
-      cursor: pointer;
-      font-weight: 600;
-      user-select: none;
-    }
-    .deploy-body {
-      padding: 0 10px 10px;
-      color: #333;
-      line-height: 1.45;
-    }
-    .deploy-body p { margin: 0.5em 0; }
-    .deploy-body ol { margin: 0.4em 0 0.4em 1.2em; padding: 0; }
-    .deploy-body li { margin-bottom: 0.35em; }
-    .deploy-body code { font-size: 10px; background: #eee; padding: 0 3px; }
-    .deploy-tip { font-size: 10px; color: #666; }
   </style>
 </head>
 <body>
@@ -220,20 +197,6 @@
       <pre id="steps" class="steps-pre"></pre>
     </details>
     <p class="foot">辅助计算，工程以产品资料与规范正文为准。ρ 单位 K·m/W；并联校正见 D.0.5（仅空气）。</p>
-    <details class="deploy">
-      <summary>微信里怎么打开？需要网页链接</summary>
-      <div class="deploy-body">
-        <p><strong>说明：</strong>微信里点链接打开的是<strong>https://…</strong> 网页。单个 .html 文件发到聊天里是文件，不是链接；要让客户在<strong>微信内置浏览器</strong>里直接用，必须把本页放到<strong>公网 HTTPS</strong>（或企业已备案域名）上。</p>
-        <p><strong>做法（任选其一）：</strong></p>
-        <ol>
-          <li><strong>Gitee Pages（国内常用）：</strong>新建公开仓库 → 本文件上传并改名为 <code>index.html</code> 放在仓库根目录 → 服务 → Gitee Pages 开启 → 用提供的 <code>https://…gitee.io/…</code> 地址发微信。</li>
-          <li><strong>GitHub Pages：</strong>同理推仓库，Settings → Pages 选分支，得到 <code>https://用户名.github.io/仓库名/</code>。</li>
-          <li><strong>Netlify Drop：</strong>打开 app.netlify.com/drop ，把本 html 拖进去（可改名为 index.html），秒得 <code>https://xxx.netlify.app</code> 链接。</li>
-          <li><strong>公司服务器 / 对象存储：</strong>Nginx 静态目录、阿里云/腾讯云 OSS 静态网站托管等，配置 HTTPS 后把链接发给客户即可。</li>
-        </ol>
-        <p class="deploy-tip">备案与合规以贵司网安要求为准；仅内网使用可放内网 HTTPS，链接仅内网微信/浏览器可访问。</p>
-      </div>
-    </details>
   </div>
   <script>
 (function () {
